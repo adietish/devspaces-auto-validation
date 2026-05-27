@@ -249,7 +249,8 @@ while IFS= read -r devfile; do
 done < ${DEVFILE_LIST_PATH}
 
 #Run the tests now that everything is set up
-echo -e "\n${BLUE}Running test scenario '${SCENARIO}' using ${DEVWORKSPACE_NAME} devworkspace in ${DEVWORKSPACE_NS} namespace...${NC}"
+CURRENT_SERVER=$(oc whoami --show-server)
+echo -e "\n${BLUE}Running test scenario '${SCENARIO}' using ${DEVWORKSPACE_NAME} devworkspace in ${DEVWORKSPACE_NS} namespace against server ${CURRENT_SERVER}...${NC}"
 
 failed_test=()
 success_count=0
