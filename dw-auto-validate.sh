@@ -69,7 +69,7 @@ done
 
 log() {
   if [ ${VERBOSE} -eq 1 ]; then
-    echo ${@}
+    echo -e "$@"
   fi
 }
 
@@ -314,17 +314,23 @@ for devfile_url in "${DEVFILE_URL_LIST[@]}"; do
       log -e "\n${GREEN}${DEVWORKSPACE_NAME} is Running${NC}"
     else
       log -e "\n${YELLOW}${DEVWORKSPACE_NAME} failed to start${NC}"
-      echo "TEST ${devfile_url} with ${image} FAILED ❌"
+      echo "TEST ${devfile_url} with ${image} FAILED ❌ (workspace state: ${state}, timed out after ${TIMEOUT}s)"
       failed_test+=("Devfile '$devfile_url' using image '$image'")
       continue
     fi
     log "Validating ${DEVWORKSPACE_NAME} .."
-    validate_devworkspace ${devfile_url}
-    if [ $? -eq 0 ]; then
+    result=$(validate_devworkspace ${devfile_url})
+    rc=$?
+    if [ ${rc} -eq 0 ]; then
       echo "TEST ${devfile_url} with ${image} PASSED ✅"
       ((success_count++))
     else
-      echo "TEST ${devfile_url} with ${image} FAILED ❌"
+      reason=$(echo "${result}" | grep '^  Reason:' | head -1)
+      if [ -n "${reason}" ]; then
+        echo "TEST ${devfile_url} with ${image} FAILED ❌ ${reason#  Reason: }"
+      else
+        echo "TEST ${devfile_url} with ${image} FAILED ❌"
+      fi
       failed_test+=("Devfile '$devfile_url' using image '$image'")
     fi
     sleep 1s
