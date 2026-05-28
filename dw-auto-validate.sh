@@ -140,7 +140,7 @@ fi
 echo -e "\n${BLUE}Checking cluster connection...${NC}"
 log "Executing 'oc whoami'..."
 current_cluster=$(oc config current-context)
-eval oc whoami ${QUIET}
+eval oc whoami --insecure-skip-tls-verify ${QUIET}
 if [ $? -eq 1 ]; then
   echo -e "${YELLOW}Not connected.${NC} Do you want to login to current cluster? Current cluster is ${PURPLE}${current_cluster}.${NC}"
   while true; do
